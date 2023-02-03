@@ -1,13 +1,23 @@
-import java.net.URL
+import kotlinx.coroutines.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.request.get
 
 const val BASE_URL = "http://kotlin-book.bignerdranch.com/2e"
 const val FLIGHT_ENDPOINT = "$BASE_URL/flight"
+const val LOYALITY_ENDPOINT = "$BASE_URL/loyality"
 
 fun main() {
-    println("Started")
-    val flight = fetchFLight()
-    println(flight)
-    println("Finished")
+    runBlocking {
+        println("Started")
+        launch {
+            println(fetchFlight())
+        }
+        println("Finished")
+    }
 }
 
-fun fetchFLight() : String = URL(FLIGHT_ENDPOINT).readText()
+suspend fun fetchFlight() : String {
+    val client = HttpClient(CIO)
+    return client.get<String>(FLIGHT_ENDPOINT)
+}

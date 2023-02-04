@@ -5,19 +5,26 @@ import io.ktor.client.request.get
 
 const val BASE_URL = "http://kotlin-book.bignerdranch.com/2e"
 const val FLIGHT_ENDPOINT = "$BASE_URL/flight"
-const val LOYALITY_ENDPOINT = "$BASE_URL/loyality"
+const val LOYALITY_ENDPOINT = "$BASE_URL/loyalty"
 
 fun main() {
     runBlocking {
         println("Started")
         launch {
-            println(fetchFlight())
+            println(fetchFlight("Arzhang"))
         }
         println("Finished")
     }
 }
 
-suspend fun fetchFlight() : String {
+suspend fun fetchFlight(passengerName: String) : FlightStatus {
     val client = HttpClient(CIO)
-    return client.get<String>(FLIGHT_ENDPOINT)
+    val flightResponse = client.get<String>(FLIGHT_ENDPOINT)
+    val loyaltyResponse = client.get<String>(LOYALITY_ENDPOINT)
+
+    return FlightStatus.parse(
+        passengerName = passengerName,
+        flightResponse = flightResponse,
+        loyaltyResponse = loyaltyResponse
+    )
 }

@@ -17,14 +17,25 @@ fun main() {
     }
 }
 
-suspend fun fetchFlight(passengerName: String) : FlightStatus {
+suspend fun fetchFlight(passengerName: String) : FlightStatus = coroutineScope {
     val client = HttpClient(CIO)
-    val flightResponse = client.get<String>(FLIGHT_ENDPOINT)
-    val loyaltyResponse = client.get<String>(LOYALITY_ENDPOINT)
 
-    return FlightStatus.parse(
+    val flightResponse = async {
+        println("Started fetching Flight info.")
+        client.get<String>(FLIGHT_ENDPOINT).also { println("Finished fetching Flight info.")  }
+    }
+
+    val loyaltyResponse = async {
+        println("Started fetching Loyalty info.")
+        client.get<String>(LOYALITY_ENDPOINT).also { println("Finished fetching Loyalty info.") }
+
+    }
+
+    delay(500)
+    println("Combining flight data")
+    FlightStatus.parse(
         passengerName = passengerName,
-        flightResponse = flightResponse,
-        loyaltyResponse = loyaltyResponse
+        flightResponse = flightResponse.await(),
+        loyaltyResponse = loyaltyResponse.await()
     )
 }

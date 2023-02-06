@@ -20,9 +20,15 @@ fun main() {
 suspend fun fetchFlight(passengerName: String) : FlightStatus = coroutineScope {
     val client = HttpClient(CIO)
 
+
     val flightResponse = async {
-        println("Started fetching Flight info.")
-        client.get<String>(FLIGHT_ENDPOINT).also { println("Finished fetching Flight info.")  }
+       println("Started fetching Flight info.")
+
+        var res: String
+        do {
+            res = client.get<String>(FLIGHT_ENDPOINT)
+        } while ((!FlightStatus.isCanceled(res)))
+        res.also {println("Finished fetching Flight info.") }
     }
 
     val loyaltyResponse = async {

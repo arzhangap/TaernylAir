@@ -6,7 +6,7 @@ data class FlightStatus (
     val destinationAirport: String,
     val status: String,
     val departureTimeInMinutes: Int
-    ) {
+) {
 
     companion object {
         fun parse(
@@ -26,6 +26,13 @@ data class FlightStatus (
                 status = status,
                 departureTimeInMinutes = departureTimeInMinutes.toInt()
             )
+        }
+
+        fun isCanceled(
+            flightResponse: String
+        ) : Boolean {
+            val (_, _, _, status, _) = flightResponse.split(",")
+            return status != "Canceled"
         }
     }
 }

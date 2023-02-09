@@ -36,3 +36,25 @@ data class FlightStatus (
         }
     }
 }
+
+enum class LotyaltyTier(
+    val tierName: String,
+    val boardingWindowStart: Int
+) {
+    Bronze("Bronze",25),
+    Silver("Bronze",25),
+    Gold("Bronze",30),
+    Platinum("Bronze",35),
+    Titanium("Bronze",40),
+    Diamond("Bronze",45),
+    DiamondPlus("Bronze",50),
+    DiamondPlusPlus("Bronze",60)
+}
+
+enum class BoardingState{
+    FlightCanceled,
+    BoardingNotStarted,
+    WaitingToBoard,
+    Boarding,
+    BoardingEnded
+}

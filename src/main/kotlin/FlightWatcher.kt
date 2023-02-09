@@ -1,5 +1,6 @@
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 
@@ -18,7 +19,8 @@ fun main() {
     }
 }
 
-fun watchFlight(initialFlight: FlightStatus) {
+suspend fun watchFlight(initialFlight: FlightStatus) {
+    val passengerName = initialFlight.passengerName
     val currentFlight: Flow<FlightStatus> = flow {
         var flight = initialFlight
         repeat(5) {
@@ -29,6 +31,12 @@ fun watchFlight(initialFlight: FlightStatus) {
             )
         }
     }
+    // consume flight data
+    currentFlight.collect {
+        println("$passengerName: $it")
+
+    }
+    println("finished tracking $passengerName's flight")
 }
 
 suspend fun fetchFligts(

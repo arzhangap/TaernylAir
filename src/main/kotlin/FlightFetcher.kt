@@ -10,10 +10,8 @@ const val LOYALITY_ENDPOINT = "$BASE_URL/loyalty"
 suspend fun fetchFlight(passengerName: String) : FlightStatus = coroutineScope {
     val client = HttpClient(CIO)
 
-
     val flightResponse = async {
        println("Started fetching Flight info.")
-
         var res: String
         do {
             res = client.get<String>(FLIGHT_ENDPOINT)
@@ -29,6 +27,7 @@ suspend fun fetchFlight(passengerName: String) : FlightStatus = coroutineScope {
 
     delay(500)
     println("Combining flight data")
+
     FlightStatus.parse(
         passengerName = passengerName,
         flightResponse = flightResponse.await(),

@@ -1,12 +1,32 @@
+import com.sun.org.apache.xpath.internal.operations.Bool
+
 data class FlightStatus (
     val flightNumber: String,
     val passengerName: String,
-    val passengerLoyaltyTier: String,
+    val passengerLoyaltyTier: LoyaltyTier,
     val originAirport: String,
     val destinationAirport: String,
     val status: String,
     val departureTimeInMinutes: Int
 ) {
+    val isFlightCanceled: Boolean
+        get() = status.equals("Canceled", ignoreCase = true)
+    val hasBoardingStarted: Boolean
+        get () = departureTimeInMinutes in 15..60
+    val isBoardingOver: Boolean
+        get() = departureTimeInMinutes < 15
+    val isEligibleToBoard: Boolean
+        get() = departureTimeInMinutes in 15..passengerLoyaltyTier.boardingWindowStart
+
+    val boardingStatus: BoardingState
+        get() = when {
+            isFlightCanceled -> BoardingState.FlightCanceled
+            isBoardingOver -> BoardingState.BoardingEnded
+            isEligibleToBoard -> BoardingState.Boarding
+            hasBoardingStarted -> BoardingState.WaitingToBoard
+            else -> BoardingState.BoardingNotStarted
+        }
+
 
     companion object {
         fun parse(
@@ -20,7 +40,8 @@ data class FlightStatus (
             return FlightStatus(
                 flightNumber = flightNumber,
                 passengerName = passengerName,
-                passengerLoyaltyTier = loyaltyTierName,
+                passengerLoyaltyTier = LoyaltyTier.values()
+                    .first{it.tierName == loyaltyTierName},
                 originAirport = originAirport,
                 destinationAirport = destinationAirport,
                 status = status,
@@ -37,18 +58,18 @@ data class FlightStatus (
     }
 }
 
-enum class LotyaltyTier(
+enum class LoyaltyTier(
     val tierName: String,
     val boardingWindowStart: Int
 ) {
     Bronze("Bronze",25),
-    Silver("Bronze",25),
-    Gold("Bronze",30),
-    Platinum("Bronze",35),
-    Titanium("Bronze",40),
-    Diamond("Bronze",45),
-    DiamondPlus("Bronze",50),
-    DiamondPlusPlus("Bronze",60)
+    Silver("Silver",25),
+    Gold("Gold",30),
+    Platinum("Platinum",35),
+    Titanium("Titanium",40),
+    Diamond("Diamond",45),
+    DiamondPlus("Diamond+",50),
+    DiamondPlusPlus("Diamond++",60)
 }
 
 enum class BoardingState{
